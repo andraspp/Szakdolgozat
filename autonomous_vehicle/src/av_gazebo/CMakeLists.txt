@@ -111,16 +111,12 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-  include
-  ${GAZEBO_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(${GAZEBO_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 ## Declare a C++ library
-##add_library(velodyne_plugin SHARED velodyne_plugin.cc)
+add_library(velodyne_plugin SHARED velodyne_plugin.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -146,7 +142,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 ##target_link_libraries(${PROJECT_NAME}_node
 ##  ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES}
 ##)
-##target_link_libraries(velodyne_plugin ${GAZEBO_libraries})
+target_link_libraries(velodyne_plugin ${GAZEBO_libraries})
 
 #############
 ## Install ##

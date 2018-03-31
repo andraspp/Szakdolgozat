@@ -538,10 +538,16 @@
       <pose frame=''>1 0.0 0 0 0 0</pose>
     </model>
     
-    <include>
-      <uri>model://velodyne_hdl32</uri>
-      <pose>0.2 0 0.30 0 0 0</pose>
-    </include>
+    
+    <model name="velodyne_lidar">
+      <include>
+       <uri>model://velodyne_hdl32</uri>
+        <pose>0.2 0 0.30 0 0 0</pose>
+      </include>
+      <!-- Attach the plugin to this model -->
+      <plugin name="velodyne_control" filename="libvelodyne_plugin.so">
+      </plugin>
+    </model>
     <joint name="velodyne_hdl-32_joint" type="fixed">
       <child>velodyne_hdl-32::base</child>
       <parent>base_frame</parent>
