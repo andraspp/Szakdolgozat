@@ -51,7 +51,7 @@ namespace gazebo
 
         // Set the joint's target velocity. This target velocity is just
         // for demonstration purposes.
-        this->model->GetJointController()->SetVelocityTarget(this->joint->GetScopedName(), 25.0);
+        this->model->GetJointController()->SetVelocityTarget(this->joint->GetScopedName(), 10.0);
     }
   };
 
