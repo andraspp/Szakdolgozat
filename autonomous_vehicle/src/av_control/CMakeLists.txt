@@ -8,6 +8,7 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED roscpp std_msgs nav_msgs actionlib_msgs laser_geometry tf)
+find_package(PCL 1.3 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(gazebo REQUIRED COMPONENTS system)
 
@@ -116,8 +117,10 @@ include_directories(
     ${std_msgs_INCLUDE_DIRS}
     ${nav_msgs_INCLUDE_DIRS}
     ${Eigen3_INCLUDE_DIR}
-    ${actionlib_msgs_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
 )
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a C++ library
 
@@ -145,6 +148,9 @@ add_executable(${PROJECT_NAME}_node av_sensorics.cpp)
 target_link_libraries(${PROJECT_NAME}_node
    ${catkin_LIBRARIES}
    ${roscpp_LIBRARIES}
+   ${PCL_LIBRARIES}
+   ${PCL_COMMON_LIBRARIES}
+   ${PCL_IO_LIBRARIES}
 )
 
 #############

@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
-  <world name="maze_world">
+  <world name="test_track_world">
     <include>
       <uri>model://ground_plane</uri>
     </include>

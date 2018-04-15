@@ -5,8 +5,8 @@ int main(int argc, char **argv)
 {
 
     ros::init(argc, argv, "av_sensorics");
-    
 
+    DEBUG_INFO = 0;
     // Exit if no ROS
     if (!ros::isInitialized())
     {
@@ -19,15 +19,12 @@ int main(int argc, char **argv)
     {
         std::cout << "ROS has been properly initialized :-) " << std::endl;
         ros::NodeHandle av_sensorics_nh_;
-        ros::Publisher  av_cloud_pub;
 
         ros::Subscriber AV_LIDAR_CHECK = av_sensorics_nh_.subscribe<sensor_msgs::LaserScan>("/av_robot/laser/scan",10,&AV_SENSORICS_LIDAR_CALLBACK);
-        av_cloud_pub = av_sensorics_nh_.advertise<sensor_msgs::PointCloud>("/av_robot/cloud",1);
         
         ros::Rate loop_rate(10);
         while(ros::ok())
         {
-            av_cloud_pub.publish(cloud); 
             ros::spinOnce();
             loop_rate.sleep();
         }
@@ -40,12 +37,42 @@ int main(int argc, char **argv)
 
 void AV_SENSORICS_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
+    tf::TransformBroadcaster broadcaster;
     laser_geometry::LaserProjection projector;
 
     try
     {
-        projector.projectLaser(*scan, cloud,-1.0, 0x03);
-        std::cout << "LIDAR info received :o! " << std::endl;
+        for (int scan_idx=0; scan_idx < 640; scan_idx++)
+        {
+            if(   (scan->ranges[scan_idx] <= scan->range_max)
+               && (scan->ranges[scan_idx] >= scan->range_min)
+            )
+            {
+                Av_scan_detection = AvTrue;
+
+                if(scan_idx <= Av_scan_low_point)
+                {
+                    Av_scan_low_point = scan_idx;
+                }
+
+                projector.projectLaser(*scan, cloud_msg,-1.0, 0x03);
+                std::cout << std::endl;
+                std::cout << Av_scan_low_point << " " << Av_scan_high_point << std::endl;
+                std::cout << scan->ranges[scan_idx] << std::endl;
+
+                
+            }
+            else
+            {
+                Av_scan_detection = AvFalse;
+                if(Av_scan_detection_LL == AvTrue)
+                {
+                    Av_scan_high_point = scan_idx - 1;
+                }
+            }
+            
+            Av_scan_detection_LL = Av_scan_detection;
+        }
     }
     catch (tf::TransformException& e)
     {

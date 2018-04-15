@@ -7,7 +7,6 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include <sensor_msgs/LaserScan.h>
-#include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/Image.h>
 #include <laser_geometry/laser_geometry.h>
@@ -17,10 +16,32 @@
 #include <tf/message_filter.h>
 #include <nav_msgs/Odometry.h>
 #include <message_filters/subscriber.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 #include <sstream>
+#include <vector>
 
-sensor_msgs::PointCloud         cloud;
+#define     AvTrue              (1)
+#define     AvFalse             (0)
+#define     AvFrontAngle        (320)
+#define     AvFrontAngleOffset  (20)
+
+sensor_msgs::PointCloud2             cloud_msg;
+const sensor_msgs::PointCloud2ConstPtr& cloud_msg_ptr = boost::make_shared<sensor_msgs::PointCloud2>(cloud_msg);
+pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
+
+signed int Av_scan_low_point;
+signed int Av_scan_high_point;
+bool       Av_scan_detection;
+bool       Av_scan_detection_LL;
+
+int DEBUG_INFO;
 
 void AV_SENSORICS_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan);
+void AV_CLOUD_CB (void);
 
 #endif
