@@ -29,19 +29,33 @@
 #define     AvFalse             (0)
 #define     AvFrontAngle        (320)
 #define     AvFrontAngleOffset  (20)
+#define     AvMaxObjects        (100)
 
 sensor_msgs::PointCloud2             cloud_msg;
 const sensor_msgs::PointCloud2ConstPtr& cloud_msg_ptr = boost::make_shared<sensor_msgs::PointCloud2>(cloud_msg);
 pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
 
-signed int Av_scan_low_point;
-signed int Av_scan_high_point;
-bool       Av_scan_detection;
-bool       Av_scan_detection_LL;
+typedef struct Av_object_s {
+    signed int Av_obj_id;
+    signed int Av_scan_low_point;
+    signed int Av_scan_high_point;
+    double     Av_object_range_avg;
+} Av_objects_t;
+
+Av_objects_t    Av_object_container[AvMaxObjects];
+bool            Av_scan_detection;
+bool            Av_scan_detection_LL;
+unsigned int    Av_num_of_objects;
 
 int DEBUG_INFO;
 
+void AV_INIT(void);
 void AV_SENSORICS_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan);
 void AV_CLOUD_CB (void);
+void AV_DETECT_FRONT_OBJECT (void);
+void AV_CLEAR_OBJECTS_ARRAY(void);
+
+unsigned int AV_NUM_OF_OBJECTS(void);
+bool AV_OBJECT_HAS_ELEMENTS(void);
 
 #endif
