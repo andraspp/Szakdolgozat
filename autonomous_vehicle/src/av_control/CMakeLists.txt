@@ -67,7 +67,7 @@ find_package(gazebo REQUIRED COMPONENTS system)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(DEPENDENCIES actionlib_msgs nav_msgs std_msgs)
+#generate_messages(DEPENDENCIES nav_msgs std_msgs)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

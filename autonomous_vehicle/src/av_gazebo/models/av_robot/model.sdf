@@ -4,7 +4,7 @@
     <link name='base_frame'>
       <pose frame=''>0 5e-06 0.04 0 -0 0</pose>
       <inertial>
-        <mass>1000</mass>
+        <mass>20</mass>
         <inertia>
           <ixx>0</ixx>
           <ixy>0</ixy>
@@ -102,7 +102,7 @@
     <link name='front_left_wheel'>
       <pose frame=''>0.55 0.6 -0.1 1.5707 -0 0</pose>
       <inertial>
-        <mass>15</mass>
+        <mass>0.01</mass>
         <inertia>
           <ixx>0</ixx>
           <ixy>0</ixy>
@@ -201,7 +201,7 @@
     <link name='front_right_wheel'>
       <pose frame=''>0.55 -0.6 -0.1 1.5707 -0 0</pose>
       <inertial>
-        <mass>15</mass>
+        <mass>0.01</mass>
         <inertia>
           <ixx>0</ixx>
           <ixy>0</ixy>
@@ -300,7 +300,7 @@
     <link name='back_left_wheel'>
       <pose frame=''>-0.55 0.6 -0.1 1.5707 -0 0</pose>
       <inertial>
-        <mass>15</mass>
+        <mass>0.01</mass>
         <inertia>
           <ixx>0</ixx>
           <ixy>0</ixy>
@@ -399,7 +399,7 @@
     <link name='back_right_wheel'>
       <pose frame=''>-0.55 -0.6 -0.1 1.5707 -0 0</pose>
       <inertial>
-        <mass>15</mass>
+        <mass>0.01</mass>
         <inertia>
           <ixx>0</ixx>
           <ixy>0</ixy>
@@ -586,7 +586,7 @@
             </scan>
             <range>
               <min>0.08</min>
-              <max>6</max>
+              <max>10</max>
               <resolution>0.01</resolution>
             </range>
             <noise>
