@@ -27,7 +27,7 @@ int main(int argc, char **argv)
         Av_cmd_vel_pub = av_sensorics_nh_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
         AV_INIT();
 
-        AV_SET_VELO(0.0, 2.0);
+        //AV_SET_VELO(0.0, 2.0);
         ros::Rate loop_rate(10);
         while(ros::ok())
         {
