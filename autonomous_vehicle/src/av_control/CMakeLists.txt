@@ -7,13 +7,13 @@ add_compile_options(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp std_msgs nav_msgs actionlib_msgs laser_geometry tf)
+find_package(catkin REQUIRED roscpp std_msgs nav_msgs actionlib_msgs laser_geometry tf cv_bridge image_transport) 
 find_package(PCL 1.3 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(gazebo REQUIRED COMPONENTS system)
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -153,6 +153,7 @@ add_executable(${PROJECT_NAME}_node
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
    ${catkin_LIBRARIES}
+   ${OpenCV_LIBS}
    ${roscpp_LIBRARIES}
    ${PCL_LIBRARIES}
    ${PCL_COMMON_LIBRARIES}

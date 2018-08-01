@@ -60,9 +60,9 @@ typedef struct Av_orientation_s {
    geometry_msgs::Quaternion orient;
 } Av_orientation_t;
 
-Av_objects_t        Av_object_container[AvMaxObjects];
-unsigned int        Av_num_of_objects;
-Av_orientation_t    Av_orientation;
+static Av_objects_t        Av_object_container[AvMaxObjects];
+static unsigned int        Av_num_of_objects;
+static Av_orientation_t    Av_orientation;
 
 void AV_INIT(void);
 void AV_SENSING_INIT(void);
