@@ -10,15 +10,16 @@
 
 void AV_PERCEPTION(void)
 {
-   if(Av_num_of_objects > 0)
-   {
-      AV_SET_OBJECT_PROXIMITY();  /* Set their proximity state */
-      AV_DETECT_FRONT_OBJECT();   /* Detect those that are in front of the AV */
-   }
-   else
-   {
-      /* Nothing to do */
-   }
+    ROS_INFO("Entered AV_PERCEPTION");
+    if(Av_num_of_objects > 0)
+    {
+        AV_SET_OBJECT_PROXIMITY();  /* Set their proximity state */
+        AV_DETECT_FRONT_OBJECT();   /* Detect those that are in front of the AV */
+    }
+    else
+    {
+        /* Nothing to do */
+    }
 }
 
 

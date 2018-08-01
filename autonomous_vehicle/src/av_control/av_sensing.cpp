@@ -23,12 +23,12 @@ void AV_SENSING_INIT(void)
 void AV_SENSING(void)
 {
    bool          tmp_array_nonempty;
-
+   ROS_INFO("Entered AV_SENSING");
    ros::NodeHandle av_sens_nh;
-   ros::Subscriber AV_IMG_CHECK   = av_sens_nh.subscribe<sensor_msgs::Image>("/av_robot/camera",sizeof(sensor_msgs::Image),&AV_SENSING_IMAGE_CALLBACK);
    ros::Subscriber AV_LIDAR_CHECK = av_sens_nh.subscribe<sensor_msgs::LaserScan>("/av_robot/laser/scan",10,&AV_SENSING_LIDAR_CALLBACK);
+   ros::Subscriber AV_IMG_CHECK   = av_sens_nh.subscribe<sensor_msgs::Image>("/av_robot/camera",sizeof(sensor_msgs::Image),&AV_SENSING_IMAGE_CALLBACK);
    ros::Subscriber AV_ODOM_CHECK  = av_sens_nh.subscribe<nav_msgs::Odometry>("/av_robot/odom",sizeof(nav_msgs::Odometry),&AV_SENSING_ODOMETRY_CALLBACK);
-
+   ros::spin();
    /***********************************************/
    /*       UPDATE OBJECTS ARRAY FOR PROCESSING   */
    /***********************************************/
@@ -83,63 +83,64 @@ void AV_SENSING(void)
 /***********************************************/
 void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
-   bool object_detected;
-   signed int num_of_objects;
+    ROS_INFO("Entered AV_SENSING_LIDAR_CALLBACK");
+    bool object_detected;
+    signed int num_of_objects;
 
-   object_detected = False;
-   num_of_objects = -1;
+    object_detected = False;
+    num_of_objects = -1;
 
-   AV_CLEAR_TMP_ARRAY();
+    AV_CLEAR_TMP_ARRAY();
 
-   for (int scan_idx=0; scan_idx < 640; scan_idx++)
-   {
-      if(   (scan->ranges[scan_idx] <= scan->range_max)
-         && (scan->ranges[scan_idx] >= scan->range_min)
-         && (num_of_objects         <  AvMaxObjects)
-      )
-      {
-          object_detected = True;
-          Av_scan_detection = True;
+    for (int scan_idx=0; scan_idx < 640; scan_idx++)
+    {
+        if(   (scan->ranges[scan_idx] <= scan->range_max)
+            && (scan->ranges[scan_idx] >= scan->range_min)
+            && (num_of_objects         <  AvMaxObjects)
+        )
+        {
+            object_detected = True;
+            Av_scan_detection = True;
 
-          if(Av_scan_detection_LL == False)
-          {
-              ++num_of_objects;
-              Av_tmp_container[num_of_objects].Av_scan_low_point              = scan_idx;
-              Av_tmp_container[num_of_objects].Av_obj_id                      = num_of_objects;
-              Av_tmp_container[num_of_objects].Av_object_proximity            = AvProximityUnknown;
-              Av_tmp_container[num_of_objects].Av_object_in_front             = False;
-              Av_tmp_container[num_of_objects].Av_object_range_min            = ((scan->range_max) + 1); /* initialize with large number */
-          }
+            if(Av_scan_detection_LL == False)
+            {
+                ++num_of_objects;
+                Av_tmp_container[num_of_objects].Av_scan_low_point              = scan_idx;
+                Av_tmp_container[num_of_objects].Av_obj_id                      = num_of_objects;
+                Av_tmp_container[num_of_objects].Av_object_proximity            = AvProximityUnknown;
+                Av_tmp_container[num_of_objects].Av_object_in_front             = False;
+                Av_tmp_container[num_of_objects].Av_object_range_min            = ((scan->range_max) + 1); /* initialize with large number */
+            }
 
-          if(   (Av_tmp_container[num_of_objects].Av_object_range_min < scan->ranges[scan_idx])
-             && (scan->ranges[scan_idx] > 0)
-            )
-          {
-             Av_tmp_container[num_of_objects].Av_object_range_min = scan->ranges[scan_idx];
-          }
+            if(   (Av_tmp_container[num_of_objects].Av_object_range_min < scan->ranges[scan_idx])
+                && (scan->ranges[scan_idx] > 0)
+                )
+            {
+                Av_tmp_container[num_of_objects].Av_object_range_min = scan->ranges[scan_idx];
+            }
 
-      }
-      else
-      {
-          Av_scan_detection = False;
-          if(Av_scan_detection_LL == True)
-          {
-              Av_tmp_container[num_of_objects].Av_scan_high_point = scan_idx - 1;
-          }
-      }
+        }
+        else
+        {
+            Av_scan_detection = False;
+            if(Av_scan_detection_LL == True)
+            {
+                Av_tmp_container[num_of_objects].Av_scan_high_point = scan_idx - 1;
+            }
+        }
 
-      Av_scan_detection_LL = Av_scan_detection;
-   }
+        Av_scan_detection_LL = Av_scan_detection;
+    }
 
-   if(object_detected == False) /* No object within range*/
-   {
-      AV_CLEAR_OBJ_ARRAY();
-   }
+    if(object_detected == False) /* No object within range*/
+    {
+        AV_CLEAR_OBJ_ARRAY();
+    }
 
-   #if((AvDebugConfig & AvDebugStoredObjectsInfoEnable) > 0)
-   ROS_INFO("temp num of objects: %d, stored num of objects: %d", num_of_objects, Av_num_of_objects);
-   ROS_INFO("Object 0's ID: %d", Av_tmp_container[0].Av_obj_id);
-   #endif /* AvDebugStoredObjectsInfoEnable */
+    #if((AvDebugConfig & AvDebugStoredObjectsInfoEnable) > 0)
+    ROS_INFO("temp num of objects: %d, stored num of objects: %d", num_of_objects, Av_num_of_objects);
+    ROS_INFO("Object 0's ID: %d", Av_tmp_container[0].Av_obj_id);
+    #endif /* AvDebugStoredObjectsInfoEnable */
 
 }
 
@@ -215,7 +216,7 @@ bool AV_TMP_HAS_ELEMENTS()
         ret_val = False;
     }
 
-    ROS_INFO("AV_TMP_HAS_ELEMENTS return value: %d", ret_val);
+    //ROS_INFO("AV_TMP_HAS_ELEMENTS return value: %d", ret_val);
     return ret_val;
 }
 

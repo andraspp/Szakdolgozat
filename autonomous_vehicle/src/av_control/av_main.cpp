@@ -18,6 +18,7 @@ int main(int argc, char **argv)
         std::cout << "ROS has been properly initialized :-) " << std::endl;
         ros::NodeHandle av_nh;
         
+        
         AV_INIT();
 
         ros::Rate loop_rate(10);
@@ -27,7 +28,6 @@ int main(int argc, char **argv)
            AV_PERCEPTION();
            AV_PLANNING();
            AV_CONTROL();
-           ros::spinOnce();
            loop_rate.sleep();
         }
     }

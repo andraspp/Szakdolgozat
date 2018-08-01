@@ -9,13 +9,14 @@
 
 void AV_CONTROL()
 {
-   ros::NodeHandle av_ctrl_nh;
+    ROS_INFO("Entered AV_CONTROL");
+    ros::NodeHandle av_ctrl_nh;
 
-   Av_cmd_vel_pub = av_ctrl_nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+    Av_cmd_vel_pub = av_ctrl_nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
-   AV_SET_VELO(0.0, 2.0);
+    AV_SET_VELO(0.0, 2.0);
 
-   AV_COLLISION_AVOIDANCE();
+    AV_COLLISION_AVOIDANCE();
 }
 
 
@@ -61,8 +62,8 @@ void AV_SET_VELO(float lin_vel, float ang_vel)
     msg.angular.z = ang_vel;
 
     #if((AvDebugConfig & AvDebugSpeedInfoEnable) > 0)
-    ROS_INFO(" ");
-    ROS_INFO("Robot ang speed: %1.8f Robot lin speed: %1.8f", msg.angular.z, msg.linear.x);
+    //ROS_INFO(" ");
+    //ROS_INFO("Robot ang speed: %1.8f Robot lin speed: %1.8f", msg.angular.z, msg.linear.x);
     #endif /* AvDebugSpeedInfoEnable */
 
     Av_cmd_vel_pub.publish(msg);
