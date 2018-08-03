@@ -1,7 +1,7 @@
 /*
  * av_perception.h
  *
- *  Created on: 2018. júl. 4.
+ *  Created on: 2018. jï¿½l. 4.
  *      Author: pappa3
  */
 
@@ -10,6 +10,8 @@
 
 #include "av_control_common.h"
 
+int AvFrontCheckHighMark;
+int AvFrontCheckLowMark;
 
 void AV_SET_OBJECT_PROXIMITY(void);
 void AV_DETECT_FRONT_OBJECT (void);

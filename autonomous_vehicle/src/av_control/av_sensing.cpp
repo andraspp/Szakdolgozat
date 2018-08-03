@@ -22,59 +22,59 @@ void AV_SENSING_INIT(void)
 
 void AV_SENSING(void)
 {
-   bool          tmp_array_nonempty;
-   ROS_INFO("Entered AV_SENSING");
-   ros::NodeHandle av_sens_nh;
-   ros::Subscriber AV_LIDAR_CHECK = av_sens_nh.subscribe<sensor_msgs::LaserScan>("/av_robot/laser/scan",10,&AV_SENSING_LIDAR_CALLBACK);
-   ros::Subscriber AV_IMG_CHECK   = av_sens_nh.subscribe<sensor_msgs::Image>("/av_robot/camera",sizeof(sensor_msgs::Image),&AV_SENSING_IMAGE_CALLBACK);
-   ros::Subscriber AV_ODOM_CHECK  = av_sens_nh.subscribe<nav_msgs::Odometry>("/av_robot/odom",sizeof(nav_msgs::Odometry),&AV_SENSING_ODOMETRY_CALLBACK);
-   ros::spin();
-   /***********************************************/
-   /*       UPDATE OBJECTS ARRAY FOR PROCESSING   */
-   /***********************************************/
-   Av_num_of_tmp_LL = Av_num_of_tmp;
-   tmp_array_nonempty = (bool)AV_TMP_HAS_ELEMENTS();
-   Av_num_of_tmp = (unsigned char)AV_NUM_OF_TMP_OBJECTS();
+    bool          tmp_array_nonempty;
+    
+    //ROS_INFO("Entered AV_SENSING");
+    //ros::NodeHandle av_sens_nh;
+    
+   
+    /***********************************************/
+    /*       UPDATE OBJECTS ARRAY FOR PROCESSING   */
+    /***********************************************/
+    Av_num_of_tmp_LL = Av_num_of_tmp;
+    tmp_array_nonempty = (bool)AV_TMP_HAS_ELEMENTS();
+    Av_num_of_tmp = (unsigned char)AV_NUM_OF_TMP_OBJECTS();
 
-   /* Number of elements in array changed, updated entire table*/
-   if(   (tmp_array_nonempty == True)
-      && (Av_num_of_tmp     < AvMaxObjects)
-      && (Av_num_of_tmp_LL != Av_num_of_tmp)
-     )
-   {
-      for (int idx=0; idx < AvMaxObjects; idx++)
-      {
-         Av_object_container[idx].Av_obj_id             = Av_tmp_container[idx].Av_obj_id;
-         Av_object_container[idx].Av_scan_low_point     = Av_tmp_container[idx].Av_scan_low_point;
-         Av_object_container[idx].Av_scan_high_point    = Av_tmp_container[idx].Av_scan_high_point;
-         Av_object_container[idx].Av_object_range_min   = Av_tmp_container[idx].Av_object_range_min;
-         Av_object_container[idx].Av_object_in_front    = Av_tmp_container[idx].Av_object_in_front;
-         Av_object_container[idx].Av_object_proximity   = Av_tmp_container[idx].Av_object_proximity;
-      }
-   }
-   /* No change in number of elements, just update angles and ranges */
-   else if(   (tmp_array_nonempty == True)
-           && (Av_num_of_tmp      <  AvMaxObjects)
-           && (Av_num_of_tmp_LL   == Av_num_of_tmp)
-          )
-   {
-      for (int idx=0; idx < AvMaxObjects; idx++)
-      {
-         Av_object_container[idx].Av_scan_low_point     = Av_tmp_container[idx].Av_scan_low_point;
-         Av_object_container[idx].Av_scan_high_point    = Av_tmp_container[idx].Av_scan_high_point;
-         Av_object_container[idx].Av_object_range_min   = Av_tmp_container[idx].Av_object_range_min;
-      }
-   }
-   /* No objects detected, clear array */
-   else if (tmp_array_nonempty == False)
-   {
-      AV_CLEAR_OBJ_ARRAY();
-   }
-   else
-   {
-      /* Do nothing */
-   }
-   Av_num_of_objects = AV_NUM_OF_OBJECTS();
+    /* Number of elements in array changed, updated entire table*/
+    if(   (tmp_array_nonempty == True)
+        && (Av_num_of_tmp     < AvMaxObjects)
+        && (Av_num_of_tmp_LL != Av_num_of_tmp)
+        )
+    {
+        for (int idx=0; idx < AvMaxObjects; idx++)
+        {
+            Av_object_container[idx].Av_obj_id             = Av_tmp_container[idx].Av_obj_id;
+            Av_object_container[idx].Av_scan_low_point     = Av_tmp_container[idx].Av_scan_low_point;
+            Av_object_container[idx].Av_scan_high_point    = Av_tmp_container[idx].Av_scan_high_point;
+            Av_object_container[idx].Av_object_range_min   = Av_tmp_container[idx].Av_object_range_min;
+            Av_object_container[idx].Av_object_in_front    = Av_tmp_container[idx].Av_object_in_front;
+            Av_object_container[idx].Av_object_proximity   = Av_tmp_container[idx].Av_object_proximity;
+        }
+    }
+    /* No change in number of elements, just update angles and ranges */
+    else if(   (tmp_array_nonempty == True)
+            && (Av_num_of_tmp      <  AvMaxObjects)
+            && (Av_num_of_tmp_LL   == Av_num_of_tmp)
+            )
+    {
+        for (int idx=0; idx < AvMaxObjects; idx++)
+        {
+            Av_object_container[idx].Av_scan_low_point     = Av_tmp_container[idx].Av_scan_low_point;
+            Av_object_container[idx].Av_scan_high_point    = Av_tmp_container[idx].Av_scan_high_point;
+            Av_object_container[idx].Av_object_range_min   = Av_tmp_container[idx].Av_object_range_min;
+        }
+    }
+    /* No objects detected, clear array */
+    else if (tmp_array_nonempty == False)
+    {
+        AV_CLEAR_OBJ_ARRAY();
+    }
+    else
+    {
+        /* Do nothing */
+    }
+    Av_num_of_objects = AV_NUM_OF_OBJECTS();
+
 }
 
 
@@ -83,7 +83,7 @@ void AV_SENSING(void)
 /***********************************************/
 void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
-    ROS_INFO("Entered AV_SENSING_LIDAR_CALLBACK");
+    //ROS_INFO("Entered AV_SENSING_LIDAR_CALLBACK");
     bool object_detected;
     signed int num_of_objects;
 
@@ -112,9 +112,9 @@ void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan)
                 Av_tmp_container[num_of_objects].Av_object_range_min            = ((scan->range_max) + 1); /* initialize with large number */
             }
 
-            if(   (Av_tmp_container[num_of_objects].Av_object_range_min < scan->ranges[scan_idx])
-                && (scan->ranges[scan_idx] > 0)
-                )
+            if(   (Av_tmp_container[num_of_objects].Av_object_range_min > (scan->ranges[scan_idx]))
+               && (scan->ranges[scan_idx] > 0)
+              )
             {
                 Av_tmp_container[num_of_objects].Av_object_range_min = scan->ranges[scan_idx];
             }

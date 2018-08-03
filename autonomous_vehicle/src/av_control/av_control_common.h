@@ -13,6 +13,10 @@
 #include <tf/transform_listener.h>
 #include <tf/message_filter.h>
 #include <message_filters/subscriber.h>
+#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include <nav_msgs/Odometry.h>
 #include <sstream>
 #include <vector>
 
@@ -20,7 +24,7 @@
 #define     False               (0)
 #define     AvFrontAngle        (320)
 #define     AvFrontAngleOffset  (5)
-#define     AvMaxObjects        (10)
+#define     AvMaxObjects        (5)
 #define     AvTmpAngleCorr      (0)
 
 /* Object range thresholds */
@@ -35,7 +39,8 @@
 #define AvDebugStoredObjectsInfoEnable  (0x04)
 #define AvDebugFrontDetInfoEnable       (0x08)
 
-#define AvDebugConfig                   (AvDebugSpeedInfoEnable | AvDebugObjectsStateInfoEnable | AvDebugStoredObjectsInfoEnable | AvDebugFrontDetInfoEnable)
+//#define AvDebugConfig                   (AvDebugSpeedInfoEnable | AvDebugObjectsStateInfoEnable | AvDebugStoredObjectsInfoEnable | AvDebugFrontDetInfoEnable)
+#define AvDebugConfig                   (0x0)
 
 typedef enum Av_proximity_level_e {
     AvProximityFar          = 0,
@@ -60,9 +65,9 @@ typedef struct Av_orientation_s {
    geometry_msgs::Quaternion orient;
 } Av_orientation_t;
 
-static Av_objects_t        Av_object_container[AvMaxObjects];
-static unsigned int        Av_num_of_objects;
-static Av_orientation_t    Av_orientation;
+extern Av_objects_t        Av_object_container[AvMaxObjects];
+extern unsigned int        Av_num_of_objects;
+extern Av_orientation_t    Av_orientation;
 
 void AV_INIT(void);
 void AV_SENSING_INIT(void);
@@ -75,5 +80,8 @@ void AV_PERCEPTION(void);
 void AV_PLANNING(void);
 void AV_CONTROL(void);
 
+void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan);
+void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan);
+void AV_SENSING_ODOMETRY_CALLBACK(const nav_msgs::Odometry::ConstPtr& odom);
 
 #endif

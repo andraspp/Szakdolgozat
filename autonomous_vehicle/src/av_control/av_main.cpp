@@ -1,5 +1,8 @@
 #include "av_control_common.h"
 
+Av_objects_t        Av_object_container[AvMaxObjects];
+unsigned int        Av_num_of_objects;
+Av_orientation_t    Av_orientation;
 
 int main(int argc, char **argv)
 {
@@ -17,6 +20,10 @@ int main(int argc, char **argv)
     {
         std::cout << "ROS has been properly initialized :-) " << std::endl;
         ros::NodeHandle av_nh;
+
+        ros::Subscriber AV_LIDAR_CHECK = av_nh.subscribe<sensor_msgs::LaserScan>("/av_robot/laser/scan",10,&AV_SENSING_LIDAR_CALLBACK);
+        ros::Subscriber AV_IMG_CHECK   = av_nh.subscribe<sensor_msgs::Image>("/av_robot/camera",sizeof(sensor_msgs::Image),&AV_SENSING_IMAGE_CALLBACK);
+        ros::Subscriber AV_ODOM_CHECK  = av_nh.subscribe<nav_msgs::Odometry>("/av_robot/odom",sizeof(nav_msgs::Odometry),&AV_SENSING_ODOMETRY_CALLBACK);
         
         
         AV_INIT();
@@ -28,6 +35,7 @@ int main(int argc, char **argv)
            AV_PERCEPTION();
            AV_PLANNING();
            AV_CONTROL();
+           ros::spinOnce();
            loop_rate.sleep();
         }
     }

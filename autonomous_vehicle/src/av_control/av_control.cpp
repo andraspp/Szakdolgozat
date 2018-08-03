@@ -9,12 +9,12 @@
 
 void AV_CONTROL()
 {
-    ROS_INFO("Entered AV_CONTROL");
+    //ROS_INFO("Entered AV_CONTROL");
     ros::NodeHandle av_ctrl_nh;
 
     Av_cmd_vel_pub = av_ctrl_nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
-    AV_SET_VELO(0.0, 2.0);
+    //AV_SET_VELO(0.0, 0.25);
 
     AV_COLLISION_AVOIDANCE();
 }
@@ -24,19 +24,21 @@ void AV_COLLISION_AVOIDANCE()
 {
     for(int idx; idx < Av_num_of_objects; idx++)
     {
+        //ROS_INFO("Nobj: %d, Oid: %d, InFr? %d, Prox: %d", Av_num_of_objects, Av_object_container[idx].Av_obj_id, Av_object_container[idx].Av_object_in_front, Av_object_container[idx].Av_object_proximity);
+
         if(   (Av_object_container[idx].Av_object_in_front  == True)
            && (Av_object_container[idx].Av_object_proximity == AvProximityDanger)
         )
         {
             /* stop to avoid collision */
-            AV_SET_VELO(0.0, 0.0);
+            //AV_SET_VELO(0.0, 0.0);
         }
         else if(   (Av_object_container[idx].Av_object_in_front == True)
                && (Av_object_container[idx].Av_object_proximity == AvProximityClose)
         )
         {
             /* slow down and turn to avoid collision */
-            AV_SET_VELO(0.25, 0.5);
+            //AV_SET_VELO(0.0, 0.125);
         }
         /*else if(   (Av_object_container[idx].Av_object_in_front  == False)
                 && (Av_object_container[idx].Av_object_proximity == AvProximityDanger)
@@ -50,7 +52,7 @@ void AV_COLLISION_AVOIDANCE()
         else
         {
             /* no change in course necessary */
-            AV_SET_VELO(0.0, 1.0);
+            //AV_SET_VELO(0.0, 0.25);
         }
     }
 }

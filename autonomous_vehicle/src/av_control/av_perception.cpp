@@ -10,7 +10,7 @@
 
 void AV_PERCEPTION(void)
 {
-    ROS_INFO("Entered AV_PERCEPTION");
+    //ROS_INFO("Entered AV_PERCEPTION");
     if(Av_num_of_objects > 0)
     {
         AV_SET_OBJECT_PROXIMITY();  /* Set their proximity state */
@@ -20,6 +20,11 @@ void AV_PERCEPTION(void)
     {
         /* Nothing to do */
     }
+
+    ROS_INFO("Object Info @ PERCEPTION");
+    ROS_INFO("Num of objects PERC: %d", Av_num_of_objects);
+    ROS_INFO("ID: %d. LP: %d, HP: %d, MINR: %lf, Fr: %d, Prox: %d", Av_object_container[0].Av_obj_id, Av_object_container[0].Av_scan_low_point, Av_object_container[0].Av_scan_high_point, Av_object_container[0].Av_object_range_min, Av_object_container[0].Av_object_in_front, Av_object_container[0].Av_object_proximity);
+    ROS_INFO("ID: %d. LP: %d, HP: %d, MINR: %lf, Fr: %d, Prox: %d", Av_object_container[1].Av_obj_id, Av_object_container[1].Av_scan_low_point, Av_object_container[1].Av_scan_high_point, Av_object_container[1].Av_object_range_min, Av_object_container[1].Av_object_in_front, Av_object_container[1].Av_object_proximity);
 }
 
 
@@ -117,13 +122,16 @@ void AV_DETECT_FRONT_OBJECT()
     ROS_INFO("Front Det entered");
     #endif /* AvDebugFrontDetInfoEnable */
 
+    AvFrontCheckHighMark = (AvFrontAngle + AvFrontAngleOffset + AvTmpAngleCorr);
+    AvFrontCheckLowMark = (AvFrontAngle - AvFrontAngleOffset + AvTmpAngleCorr);
+    ROS_INFO("HighMark: %d, LowMark: %d", AvFrontCheckHighMark, AvFrontCheckLowMark);
+
     for(int idx; idx < Av_num_of_objects; idx++)
     {
-        if(   ((AvFrontAngle + AvFrontAngleOffset + AvTmpAngleCorr) >= Av_object_container[idx].Av_scan_low_point  <= (AvFrontAngle - AvFrontAngleOffset + AvTmpAngleCorr)) /*TODO: implement turn angle correction*/
-           || ((AvFrontAngle + AvFrontAngleOffset + AvTmpAngleCorr) >= Av_object_container[idx].Av_scan_high_point >= (AvFrontAngle - AvFrontAngleOffset + AvTmpAngleCorr))
-           || (   ((AvFrontAngle + AvFrontAngleOffset + AvTmpAngleCorr) <= Av_object_container[idx].Av_scan_high_point)
-               && ((AvFrontAngle - AvFrontAngleOffset + AvTmpAngleCorr) >= Av_object_container[idx].Av_scan_low_point)
-              )
+        if(   ((AvFrontCheckHighMark <= Av_object_container[idx].Av_scan_high_point) && (AvFrontCheckLowMark >= Av_object_container[idx].Av_scan_low_point)) /*TODO: implement turn angle correction*/
+           || ((AvFrontCheckHighMark >= Av_object_container[idx].Av_scan_high_point) && (AvFrontCheckLowMark <= Av_object_container[idx].Av_scan_low_point))
+           || ((AvFrontCheckHighMark >= Av_object_container[idx].Av_scan_high_point) && (AvFrontCheckLowMark <= Av_object_container[idx].Av_scan_high_point))
+           || ((AvFrontCheckHighMark >= Av_object_container[idx].Av_scan_low_point)  && (AvFrontCheckLowMark <= Av_object_container[idx].Av_scan_low_point))
           )
         {
             #if((AvDebugConfig & AvDebugFrontDetInfoEnable) > 0)
