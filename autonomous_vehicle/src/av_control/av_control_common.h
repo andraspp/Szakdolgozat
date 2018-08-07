@@ -23,7 +23,7 @@
 #define     True                (1)
 #define     False               (0)
 #define     AvFrontAngle        (320)
-#define     AvFrontAngleOffset  (5)
+#define     AvFrontAngleOffset  (15)
 #define     AvMaxObjects        (5)
 #define     AvTmpAngleCorr      (0)
 

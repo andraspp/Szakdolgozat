@@ -118,6 +118,7 @@ void AV_SET_OBJECT_PROXIMITY()
 
 void AV_DETECT_FRONT_OBJECT()
 {
+    char idx;
     #if((AvDebugConfig & AvDebugFrontDetInfoEnable) > 0)
     ROS_INFO("Front Det entered");
     #endif /* AvDebugFrontDetInfoEnable */
@@ -126,7 +127,7 @@ void AV_DETECT_FRONT_OBJECT()
     AvFrontCheckLowMark = (AvFrontAngle - AvFrontAngleOffset + AvTmpAngleCorr);
     ROS_INFO("HighMark: %d, LowMark: %d", AvFrontCheckHighMark, AvFrontCheckLowMark);
 
-    for(int idx; idx < Av_num_of_objects; idx++)
+    for(idx = 0; idx < Av_num_of_objects; idx++)
     {
         if(   ((AvFrontCheckHighMark <= Av_object_container[idx].Av_scan_high_point) && (AvFrontCheckLowMark >= Av_object_container[idx].Av_scan_low_point)) /*TODO: implement turn angle correction*/
            || ((AvFrontCheckHighMark >= Av_object_container[idx].Av_scan_high_point) && (AvFrontCheckLowMark <= Av_object_container[idx].Av_scan_low_point))
