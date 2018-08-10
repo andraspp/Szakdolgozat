@@ -10,6 +10,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED roscpp std_msgs nav_msgs actionlib_msgs laser_geometry tf cv_bridge image_transport) 
 find_package(PCL 1.3 REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(OpenCV REQUIRED)
 find_package(gazebo REQUIRED COMPONENTS system)
 
 ## System dependencies are found with CMake's conventions
@@ -118,6 +119,7 @@ include_directories(
     ${nav_msgs_INCLUDE_DIRS}
     ${Eigen3_INCLUDE_DIR}
     ${PCL_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
 )
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
@@ -153,7 +155,7 @@ add_executable(${PROJECT_NAME}_node
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
    ${catkin_LIBRARIES}
-   ${OpenCV_LIBS}
+   ${OpenCV_LIBRARIES}
    ${roscpp_LIBRARIES}
    ${PCL_LIBRARIES}
    ${PCL_COMMON_LIBRARIES}

@@ -12,6 +12,7 @@
 
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
+#include <sensor_msgs/image_encodings.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -23,7 +24,7 @@ unsigned int                  Av_num_of_tmp_LL;
 bool                          Av_scan_detection;
 bool                          Av_scan_detection_LL;
 Av_objects_t                  Av_tmp_container[AvMaxObjects];
-cv_bridge::CvImageConstPtr    Av_cv_ptr;
+cv_bridge::CvImagePtr         Av_cv_ptr;
 
 void AV_CLEAR_TMP_ARRAY(void);
 void AV_CLEAR_OBJ_ARRAY(void);

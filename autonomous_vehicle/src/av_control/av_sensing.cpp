@@ -83,7 +83,7 @@ void AV_SENSING(void)
 /***********************************************/
 void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
-    //ROS_INFO("Entered AV_SENSING_LIDAR_CALLBACK");
+    ROS_INFO("Entered AV_SENSING_LIDAR_CALLBACK");
     bool object_detected;
     signed int num_of_objects;
 
@@ -160,18 +160,21 @@ void AV_SENSING_ODOMETRY_CALLBACK(const nav_msgs::Odometry::ConstPtr& odom)
 /***********************************************/
 void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
 {
-   /* convert to openCV somehow */
-   try
-   {
-      Av_cv_ptr = cv_bridge::toCvShare(img_scan, sensor_msgs::image_encodings::BGR8);
-   }
-   catch (cv_bridge::Exception& e)
-   {
-      ROS_ERROR("cv_bridge exception: %s", e.what());
-      return;
-   }
+    ROS_INFO("Entered AV_SENSING_IMAGE_CALLBACK");
+    /* convert to openCV somehow */
+    try
+    {
+        Av_cv_ptr = cv_bridge::toCvCopy(img_scan, sensor_msgs::image_encodings::BGR8);
+    }
+    catch (cv_bridge::Exception& e)
+    {
+        ROS_ERROR("cv_bridge exception: %s", e.what());
+        return;
+    }
 
-   // Process Av_cv_ptr->image using OpenCV
+    cv::namedWindow("Image window");
+    cv::imshow("Image window",Av_cv_ptr->image);
+    // Process Av_cv_ptr->image using OpenCV
 }
 
 /***********************************************/
