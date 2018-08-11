@@ -164,7 +164,7 @@ void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
     /* convert to openCV somehow */
     try
     {
-        Av_cv_ptr = cv_bridge::toCvCopy(img_scan, sensor_msgs::image_encodings::BGR8);
+        Av_cv_ptr = cv_bridge::toCvCopy(img_scan, sensor_msgs::image_encodings::TYPE_8UC3);
     }
     catch (cv_bridge::Exception& e)
     {
@@ -172,9 +172,18 @@ void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
         return;
     }
 
+    FrontCamImageIHLS = Av_cv_ptr->image.clone();
+
+    for (auto it = FrontCamImageIHLS.begin<cv::Vec3b>(); it != FrontCamImageIHLS.end<cv::Vec3b>(); ++it) 
+    {
+        const cv::Vec3b bgr = (*it);
+        (*it)[0] = static_cast<uchar> (retrieve_saturation(static_cast<float> (bgr[2]), static_cast<float> (bgr[1]), static_cast<float> (bgr[0])));
+        (*it)[1] = static_cast<uchar> (retrieve_luminance(static_cast<float> (bgr[2]), static_cast<float> (bgr[1]), static_cast<float> (bgr[0])));
+        (*it)[2] = static_cast<uchar> (retrieve_normalised_hue(static_cast<float> (bgr[2]), static_cast<float> (bgr[1]), static_cast<float> (bgr[0])));
+    }
+
     cv::namedWindow("Image window");
-    cv::imshow("Image window",Av_cv_ptr->image);
-    // Process Av_cv_ptr->image using OpenCV
+    cv::imshow("Image window",FrontCamImageIHLS);
 }
 
 /***********************************************/

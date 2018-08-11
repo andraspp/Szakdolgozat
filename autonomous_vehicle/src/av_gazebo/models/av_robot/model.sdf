@@ -518,11 +518,11 @@
             <near>0.02</near>
             <far>300</far>
           </clip>
-          <update_rate>10</update_rate>
-          <visualize>false</visualize>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
           <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
             <alwaysOn>true</alwaysOn>
-            <updateRate>10.0</updateRate>
+            <updateRate>30</updateRate>
             <cameraName>camera_front</cameraName>
             <imageTopicName>image_raw</imageTopicName>
             <cameraInfoTopicName>camera_info</cameraInfoTopicName>
