@@ -6,18 +6,24 @@
  */
 #include "av_sensing.h"
 
+using namespace cv;
+using namespace std;
+
 void AV_SENSING_INIT(void)
 {
-   AV_CLEAR_OBJ_ARRAY();
-   AV_CLEAR_TMP_ARRAY();
-   Av_object_detected      = False;
-   Av_num_of_tmp           = 0;
-   Av_num_of_tmp_LL        = 0;
-   Av_scan_detection       = False;
-   Av_scan_detection_LL    = False;
-   Av_orientation.pose_x = 0;
-   Av_orientation.pose_y = 0;
-   Av_orientation.pose_z = 0;
+    AV_CLEAR_OBJ_ARRAY();
+    AV_CLEAR_TMP_ARRAY();
+    Av_object_detected      = False;
+    Av_num_of_tmp           = 0;
+    Av_num_of_tmp_LL        = 0;
+    Av_scan_detection       = False;
+    Av_scan_detection_LL    = False;
+    Av_orientation.pose_x = 0;
+    Av_orientation.pose_y = 0;
+    Av_orientation.pose_z = 0;
+
+    temp_img = imread("stopsign",0);
+    namedWindow("Image window", CV_WINDOW_AUTOSIZE);
 }
 
 void AV_SENSING(void)
@@ -160,11 +166,18 @@ void AV_SENSING_ODOMETRY_CALLBACK(const nav_msgs::Odometry::ConstPtr& odom)
 /***********************************************/
 void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
 {
+    Scalar Av_lower_red(160,175,0);
+    Scalar Av_upper_red(179,255,255);
+    Scalar box;
+    RotatedRect rect;
+
+    Av_StopSignDet = 0;
+
     ROS_INFO("Entered AV_SENSING_IMAGE_CALLBACK");
     /* convert to openCV somehow */
     try
     {
-        Av_cv_ptr = cv_bridge::toCvCopy(img_scan, sensor_msgs::image_encodings::TYPE_8UC3);
+        Av_cv_ptr = cv_bridge::toCvCopy(img_scan, sensor_msgs::image_encodings::BGR8);
     }
     catch (cv_bridge::Exception& e)
     {
@@ -172,18 +185,56 @@ void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
         return;
     }
 
-    FrontCamImageIHLS = Av_cv_ptr->image.clone();
-
-    for (auto it = FrontCamImageIHLS.begin<cv::Vec3b>(); it != FrontCamImageIHLS.end<cv::Vec3b>(); ++it) 
+    try
     {
-        const cv::Vec3b bgr = (*it);
-        (*it)[0] = static_cast<uchar> (retrieve_saturation(static_cast<float> (bgr[2]), static_cast<float> (bgr[1]), static_cast<float> (bgr[0])));
-        (*it)[1] = static_cast<uchar> (retrieve_luminance(static_cast<float> (bgr[2]), static_cast<float> (bgr[1]), static_cast<float> (bgr[0])));
-        (*it)[2] = static_cast<uchar> (retrieve_normalised_hue(static_cast<float> (bgr[2]), static_cast<float> (bgr[1]), static_cast<float> (bgr[0])));
+    //cvtColor(Av_cv_ptr->image, Av_img_gray, cv::COLOR_BGR2GRAY);
+    cvtColor(Av_cv_ptr->image, Av_img_hsv,  cv::COLOR_BGR2HSV);
+
+    inRange(Av_img_hsv, Scalar(Av_lower_red[0], Av_lower_red[1], Av_lower_red[2]), Scalar(Av_upper_red[0], Av_upper_red[1], Av_upper_red[2]), mask); //Threshold the image
+        
+    //morphological opening (remove small objects from the foreground)
+    erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+    dilate( mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+
+    //morphological closing (fill small holes in the foreground)
+    dilate( mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+    erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+
+    Moments oMoments = moments(mask);
+
+    double dM01 = oMoments.m01;
+    double dM10 = oMoments.m10;
+    double dArea = oMoments.m00;
+
+    if (dArea > 10000)
+    {
+        Av_StopSignDet = 1;
     }
 
-    cv::namedWindow("Image window");
-    cv::imshow("Image window",FrontCamImageIHLS);
+    //morphologyEx(mask, mask, MORPH_OPEN, Mat::ones(100, 100, CV_8U), Point(-1,-1), 1, BORDER_CONSTANT, morphologyDefaultBorderValue());
+    //morphologyEx(mask, mask, MORPH_CLOSE, Mat::ones(100, 100, CV_8U), Point(-1,-1), 1, BORDER_CONSTANT, morphologyDefaultBorderValue());
+    findContours(mask, Av_contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+    }
+    catch( Exception& e )
+    {
+        const char* err_msg = e.what();
+        std::cout << "exception caught: " << err_msg << std::endl;
+    }
+
+    if (sizeof(Av_contours) > 0)
+    {
+        
+    }
+    ROS_INFO("Stop sign detected: %d", Av_StopSignDet);
+
+
+    //GaussianBlur(Av_img_gray, Av_img_blurred, Size(5, 5), 0);
+    //Canny(Av_img_blurred, Av_img_edged, 50, 200, 255);
+
+    //findContours(Av_img_edged, Av_contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+
+
+    imshow("Image window",mask);
 }
 
 /***********************************************/

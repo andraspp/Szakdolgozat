@@ -11,7 +11,6 @@ find_package(catkin REQUIRED roscpp std_msgs nav_msgs actionlib_msgs laser_geome
 find_package(PCL 1.3 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(gazebo REQUIRED COMPONENTS system)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
@@ -113,7 +112,7 @@ catkin_package(CATKIN_DEPENDS nav_msgs)
 ## Your package locations should be listed before other locations
 include_directories(
     include 
-    ${catkin_INCLUDE_DIRS} 
+    ${catkin_INCLUDE_DIRS}
     ${roscpp_INCLUDE_DIRS} 
     ${std_msgs_INCLUDE_DIRS}
     ${nav_msgs_INCLUDE_DIRS}

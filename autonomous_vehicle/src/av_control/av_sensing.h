@@ -15,39 +15,22 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-
+#include <opencv2/videoio.hpp>
 
 
 bool                          Av_object_detected;
 unsigned int                  Av_num_of_tmp;
 unsigned int                  Av_num_of_tmp_LL;
+unsigned char                 Av_StopSignDet;
 bool                          Av_scan_detection;
 bool                          Av_scan_detection_LL;
 Av_objects_t                  Av_tmp_container[AvMaxObjects];
 cv_bridge::CvImagePtr         Av_cv_ptr;
-cv::Mat                       FrontCamImageIHLS;
+cv::Mat                       Av_img_gray, Av_img_blurred, Av_img_edged, Av_img_hsv;
+cv::Mat                       mask, temp_img;
+std::vector<cv::Vec4i>            Av_hierarchy;
+std::vector<std::vector<cv::Point> >   Av_contours;
 
-// Maximum between three values
-inline float get_maximum(const float& r, const float& g, const float& b) 
-{ 
-    return (r >= g) ? ((r >= b) ? r : b) : ((g >= b) ? g : b); 
-}
-
-// Minimum between three values
-inline float get_minimum(const float& r, const float& g, const float& b) 
-{ 
-    return (r <= g) ? ((r <= b) ? r : b) : ((g <= b) ? g : b); 
-}
-
-
-// Theta computation
-inline float retrieve_theta(const float& r, const float& g, const float& b) { return acos((r - (g * 0.5) - (b * 0.5)) / sqrtf((r * r) + (g * g) + (b * b) - (r * g) - (r * b) - (g * b))); }
-// Hue computation -- H = θ if B <= G -- H = 2 * pi − θ if B > G
-inline float retrieve_normalised_hue(const float& r, const float& g, const float& b) { return (b <= g) ? (retrieve_theta(r, g, b) * 255.f / (2.f * M_PI)) : (((2.f * M_PI) - retrieve_theta(r, g, b)) * 255.f / (2.f * M_PI)); }
-// Luminance computation -- L = 0.210R + 0.715G + 0.072B
-inline float retrieve_luminance(const float& r, const float& g, const float& b) { return (0.210f * r) + (0.715f * g) + (0.072f * b); }
-// Saturation computation -- S = max(R, G, B) − min(R, G, B)
-inline float retrieve_saturation(const float& r, const float& g, const float& b) { return (get_maximum(r, g, b) - get_minimum(r, g, b)); }
 
 void AV_CLEAR_TMP_ARRAY(void);
 void AV_CLEAR_OBJ_ARRAY(void);

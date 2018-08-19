@@ -7,7 +7,9 @@ project(av_gazebo)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(gazebo REQUIRED COMPONENTS system)
+find_package(catkin REQUIRED COMPONENTS
+  gazebo_ros
+)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -102,7 +104,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES av_gazebo
 #  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
+#  DEPENDS gazebo_ros
 )
 
 ###########
@@ -111,12 +113,12 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(${GAZEBO_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 ## Declare a C++ library
-add_library(velodyne_plugin SHARED velodyne_plugin.cpp)
+# add_library(velodyne_plugin SHARED velodyne_plugin.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -142,7 +144,7 @@ add_library(velodyne_plugin SHARED velodyne_plugin.cpp)
 ##target_link_libraries(${PROJECT_NAME}_node
 ##  ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES}
 ##)
-target_link_libraries(velodyne_plugin ${GAZEBO_libraries})
+#target_link_libraries(velodyne_plugin ${GAZEBO_libraries})
 
 #############
 ## Install ##
