@@ -21,9 +21,6 @@ void AV_SENSING_INIT(void)
     Av_orientation.pose_x = 0;
     Av_orientation.pose_y = 0;
     Av_orientation.pose_z = 0;
-
-    temp_img = imread("stopsign",0);
-    namedWindow("Image window", CV_WINDOW_AUTOSIZE);
 }
 
 void AV_SENSING(void)
@@ -206,7 +203,7 @@ void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
         double dM10 = oMoments.m10;
         double dArea = oMoments.m00;
 
-        if (dArea > 10000)
+        if (dArea > 30000)
         {
             Av_StopSignDet = 1;
         }
