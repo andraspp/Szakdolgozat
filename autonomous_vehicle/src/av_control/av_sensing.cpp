@@ -187,33 +187,33 @@ void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
 
     try
     {
-    //cvtColor(Av_cv_ptr->image, Av_img_gray, cv::COLOR_BGR2GRAY);
-    cvtColor(Av_cv_ptr->image, Av_img_hsv,  cv::COLOR_BGR2HSV);
+        //cvtColor(Av_cv_ptr->image, Av_img_gray, cv::COLOR_BGR2GRAY);
+        cvtColor(Av_cv_ptr->image, Av_img_hsv,  cv::COLOR_BGR2HSV);
 
-    inRange(Av_img_hsv, Scalar(Av_lower_red[0], Av_lower_red[1], Av_lower_red[2]), Scalar(Av_upper_red[0], Av_upper_red[1], Av_upper_red[2]), mask); //Threshold the image
-        
-    //morphological opening (remove small objects from the foreground)
-    erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-    dilate( mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+        inRange(Av_img_hsv, Scalar(Av_lower_red[0], Av_lower_red[1], Av_lower_red[2]), Scalar(Av_upper_red[0], Av_upper_red[1], Av_upper_red[2]), mask); //Threshold the image
+            
+        //morphological opening (remove small objects from the foreground)
+        erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        dilate( mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
 
-    //morphological closing (fill small holes in the foreground)
-    dilate( mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-    erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        //morphological closing (fill small holes in the foreground)
+        dilate( mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+        erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
 
-    Moments oMoments = moments(mask);
+        Moments oMoments = moments(mask);
 
-    double dM01 = oMoments.m01;
-    double dM10 = oMoments.m10;
-    double dArea = oMoments.m00;
+        double dM01 = oMoments.m01;
+        double dM10 = oMoments.m10;
+        double dArea = oMoments.m00;
 
-    if (dArea > 10000)
-    {
-        Av_StopSignDet = 1;
-    }
+        if (dArea > 10000)
+        {
+            Av_StopSignDet = 1;
+        }
 
-    //morphologyEx(mask, mask, MORPH_OPEN, Mat::ones(100, 100, CV_8U), Point(-1,-1), 1, BORDER_CONSTANT, morphologyDefaultBorderValue());
-    //morphologyEx(mask, mask, MORPH_CLOSE, Mat::ones(100, 100, CV_8U), Point(-1,-1), 1, BORDER_CONSTANT, morphologyDefaultBorderValue());
-    findContours(mask, Av_contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvPoint(0,0));
+        //morphologyEx(mask, mask, MORPH_OPEN, Mat::ones(100, 100, CV_8U), Point(-1,-1), 1, BORDER_CONSTANT, morphologyDefaultBorderValue());
+        //morphologyEx(mask, mask, MORPH_CLOSE, Mat::ones(100, 100, CV_8U), Point(-1,-1), 1, BORDER_CONSTANT, morphologyDefaultBorderValue());
+        //findContours(mask, Av_contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvPoint(0,0));
     }
     catch( Exception& e )
     {
@@ -221,20 +221,7 @@ void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
         std::cout << "exception caught: " << err_msg << std::endl;
     }
 
-    if (sizeof(Av_contours) > 0)
-    {
-        
-    }
     ROS_INFO("Stop sign detected: %d", Av_StopSignDet);
-
-
-    //GaussianBlur(Av_img_gray, Av_img_blurred, Size(5, 5), 0);
-    //Canny(Av_img_blurred, Av_img_edged, 50, 200, 255);
-
-    //findContours(Av_img_edged, Av_contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-
-
-    imshow("Image window",mask);
 }
 
 /***********************************************/
