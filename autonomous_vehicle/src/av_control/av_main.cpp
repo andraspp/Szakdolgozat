@@ -3,6 +3,9 @@
 Av_objects_t        Av_object_container[AvMaxObjects];
 unsigned int        Av_num_of_objects;
 Av_orientation_t    Av_orientation;
+Mat                 Av_img_hsv, Av_img_threshold;
+bool                Av_StopSignDet;
+
 
 int main(int argc, char **argv)
 {
@@ -45,6 +48,7 @@ int main(int argc, char **argv)
 
 void AV_INIT()
 {
+   Av_StopSignDet = False;
    AV_SENSING_INIT();
 }
 

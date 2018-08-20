@@ -150,3 +150,42 @@ void AV_DETECT_FRONT_OBJECT()
 
     }
 }
+
+void AV_DETECT_STOP_SIGN(Mat image)
+{
+    Scalar Av_lower_red(160,175,0);
+    Scalar Av_upper_red(179,255,255);
+    
+    Av_StopSignDet = False;
+
+    try
+    {
+        inRange(image, Scalar(Av_lower_red[0], Av_lower_red[1], Av_lower_red[2]), Scalar(Av_upper_red[0], Av_upper_red[1], Av_upper_red[2]), Av_img_threshold); //Threshold the image
+            
+        //morphological opening (remove small objects from the foreground)
+        erode(Av_img_threshold, Av_img_threshold, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        dilate(Av_img_threshold, Av_img_threshold, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+
+        //morphological closing (fill small holes in the foreground)
+        dilate(Av_img_threshold, Av_img_threshold, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+        erode(Av_img_threshold, Av_img_threshold, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+
+        Moments oMoments = moments(Av_img_threshold);
+
+        double dM01 = oMoments.m01;
+        double dM10 = oMoments.m10;
+        double dArea = oMoments.m00;
+
+        if (dArea > 30000)
+        {
+            Av_StopSignDet = True;
+        }
+    }
+    catch( cv::Exception& e )
+    {
+        const char* err_msg = e.what();
+        std::cout << "exception caught: " << err_msg << std::endl;
+    }
+
+    ROS_INFO("Stop sign detected: %d", Av_StopSignDet);
+}

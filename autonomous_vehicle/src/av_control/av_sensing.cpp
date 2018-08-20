@@ -6,8 +6,6 @@
  */
 #include "av_sensing.h"
 
-using namespace cv;
-using namespace std;
 
 void AV_SENSING_INIT(void)
 {
@@ -163,62 +161,20 @@ void AV_SENSING_ODOMETRY_CALLBACK(const nav_msgs::Odometry::ConstPtr& odom)
 /***********************************************/
 void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
 {
-    Scalar Av_lower_red(160,175,0);
-    Scalar Av_upper_red(179,255,255);
-    Scalar box;
-    RotatedRect rect;
-
-    Av_StopSignDet = 0;
-
     ROS_INFO("Entered AV_SENSING_IMAGE_CALLBACK");
     /* convert to openCV somehow */
     try
     {
         Av_cv_ptr = cv_bridge::toCvCopy(img_scan, sensor_msgs::image_encodings::BGR8);
+        cvtColor(Av_cv_ptr->image, Av_img_hsv,  cv::COLOR_BGR2HSV);
+        AV_DETECT_STOP_SIGN(Av_img_hsv);
     }
     catch (cv_bridge::Exception& e)
     {
         ROS_ERROR("cv_bridge exception: %s", e.what());
         return;
     }
-
-    try
-    {
-        //cvtColor(Av_cv_ptr->image, Av_img_gray, cv::COLOR_BGR2GRAY);
-        cvtColor(Av_cv_ptr->image, Av_img_hsv,  cv::COLOR_BGR2HSV);
-
-        inRange(Av_img_hsv, Scalar(Av_lower_red[0], Av_lower_red[1], Av_lower_red[2]), Scalar(Av_upper_red[0], Av_upper_red[1], Av_upper_red[2]), mask); //Threshold the image
-            
-        //morphological opening (remove small objects from the foreground)
-        erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-        dilate( mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-
-        //morphological closing (fill small holes in the foreground)
-        dilate( mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-        erode(mask, mask, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-
-        Moments oMoments = moments(mask);
-
-        double dM01 = oMoments.m01;
-        double dM10 = oMoments.m10;
-        double dArea = oMoments.m00;
-
-        if (dArea > 30000)
-        {
-            Av_StopSignDet = 1;
-        }
-
-        //morphologyEx(mask, mask, MORPH_OPEN, Mat::ones(100, 100, CV_8U), Point(-1,-1), 1, BORDER_CONSTANT, morphologyDefaultBorderValue());
-        //morphologyEx(mask, mask, MORPH_CLOSE, Mat::ones(100, 100, CV_8U), Point(-1,-1), 1, BORDER_CONSTANT, morphologyDefaultBorderValue());
-        //findContours(mask, Av_contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, cvPoint(0,0));
-    }
-    catch( Exception& e )
-    {
-        const char* err_msg = e.what();
-        std::cout << "exception caught: " << err_msg << std::endl;
-    }
-
-    ROS_INFO("Stop sign detected: %d", Av_StopSignDet);
+   
 }
 
 /***********************************************/
