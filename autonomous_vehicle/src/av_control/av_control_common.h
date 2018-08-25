@@ -76,7 +76,6 @@ typedef struct Av_orientation_s {
 extern Av_objects_t        Av_object_container[AvMaxObjects];
 extern unsigned int        Av_num_of_objects;
 extern Av_orientation_t    Av_orientation;
-extern Mat                 Av_img_hsv, Av_img_threshold;
 extern bool                Av_StopSignDet;
 
 
@@ -92,6 +91,11 @@ void AV_PLANNING(void);
 void AV_CONTROL(void);
 
 void AV_DETECT_STOP_SIGN(Mat image);
+void AV_DETECT_LANE(Mat image);
+
+void AV_LINE_FOLLOW(Moments mom, int img_height, int img_width);
+
+void AV_SET_VELO(float lin_vel, float ang_vel);
 
 void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan);
 void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan);

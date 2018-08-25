@@ -166,8 +166,9 @@ void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
     try
     {
         Av_cv_ptr = cv_bridge::toCvCopy(img_scan, sensor_msgs::image_encodings::BGR8);
-        cvtColor(Av_cv_ptr->image, Av_img_hsv,  cv::COLOR_BGR2HSV);
-        AV_DETECT_STOP_SIGN(Av_img_hsv);
+
+        AV_DETECT_STOP_SIGN(Av_cv_ptr->image);
+        AV_DETECT_LANE(Av_cv_ptr->image);
     }
     catch (cv_bridge::Exception& e)
     {

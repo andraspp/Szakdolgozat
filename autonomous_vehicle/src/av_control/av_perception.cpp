@@ -155,22 +155,25 @@ void AV_DETECT_STOP_SIGN(Mat image)
 {
     Scalar Av_lower_red(160,175,0);
     Scalar Av_upper_red(179,255,255);
+    Mat img_hsv;
+    Mat img_thr;
     
     Av_StopSignDet = False;
 
     try
     {
-        inRange(image, Scalar(Av_lower_red[0], Av_lower_red[1], Av_lower_red[2]), Scalar(Av_upper_red[0], Av_upper_red[1], Av_upper_red[2]), Av_img_threshold); //Threshold the image
+        cvtColor(image, img_hsv,  cv::COLOR_BGR2HSV);
+        inRange(img_hsv, Scalar(Av_lower_red[0], Av_lower_red[1], Av_lower_red[2]), Scalar(Av_upper_red[0], Av_upper_red[1], Av_upper_red[2]), img_thr); //Threshold the image
             
         //morphological opening (remove small objects from the foreground)
-        erode(Av_img_threshold, Av_img_threshold, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-        dilate(Av_img_threshold, Av_img_threshold, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+        erode(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        dilate(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
 
         //morphological closing (fill small holes in the foreground)
-        dilate(Av_img_threshold, Av_img_threshold, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-        erode(Av_img_threshold, Av_img_threshold, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        dilate(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+        erode(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
 
-        Moments oMoments = moments(Av_img_threshold);
+        Moments oMoments = moments(img_thr);
 
         double dM01 = oMoments.m01;
         double dM10 = oMoments.m10;
@@ -188,4 +191,34 @@ void AV_DETECT_STOP_SIGN(Mat image)
     }
 
     ROS_INFO("Stop sign detected: %d", Av_StopSignDet);
+}
+
+void AV_DETECT_LANE(Mat image)
+{
+    Scalar Av_lower_black(0,0,0);
+    Scalar Av_upper_black(180,255,30);
+    Mat img_hsv;
+    Mat img_thr;
+
+    int img_height, img_width;
+;
+
+    try
+    {
+        img_width = image.size().width;
+        img_height = image.size().height;
+
+        cvtColor(image, img_hsv, COLOR_BGR2HSV);
+        inRange(img_hsv, Av_lower_black, Av_upper_black, img_thr); //Threshold the image
+
+        Moments mom = moments(img_thr, false);
+
+        AV_LINE_FOLLOW(mom, img_height, img_width);       		
+
+    }
+    catch( cv::Exception& e )
+    {
+        const char* err_msg = e.what();
+        std::cout << "exception caught: " << err_msg << std::endl;
+    }
 }

@@ -3,7 +3,6 @@
 Av_objects_t        Av_object_container[AvMaxObjects];
 unsigned int        Av_num_of_objects;
 Av_orientation_t    Av_orientation;
-Mat                 Av_img_hsv, Av_img_threshold;
 bool                Av_StopSignDet;
 
 

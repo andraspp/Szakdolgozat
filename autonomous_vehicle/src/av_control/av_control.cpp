@@ -14,7 +14,7 @@ void AV_CONTROL()
 
     Av_cmd_vel_pub = av_ctrl_nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
-    //AV_SET_VELO(0.0, 0.25);
+    //AV_SET_VELO(0.0, 0.3);
 
     AV_COLLISION_AVOIDANCE();
 }

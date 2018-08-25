@@ -1,7 +1,7 @@
 /*
  * av_control.h
  *
- *  Created on: 2018. júl. 4.
+ *  Created on: 2018. jï¿½l. 4.
  *      Author: pappa3
  */
 
@@ -13,7 +13,6 @@
 
 ros::Publisher  Av_cmd_vel_pub;
 
-void AV_SET_VELO(float lin_vel, float ang_vel);
 void AV_COLLISION_AVOIDANCE(void);
 
 #endif /* SRC_AV_CONTROL_AV_CONTROL_H_ */
