@@ -11,8 +11,12 @@
 #include "av_control_common.h"
 #include <geometry_msgs/Twist.h>
 
+#define AvSpeedGrad     (0.2)
+
 ros::Publisher  Av_cmd_vel_pub;
 
-void AV_COLLISION_AVOIDANCE(void);
+double Av_current_speed;
+double Av_current_yaw;
+
 
 #endif /* SRC_AV_CONTROL_AV_CONTROL_H_ */

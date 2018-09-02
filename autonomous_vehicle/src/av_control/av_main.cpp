@@ -3,11 +3,14 @@
 Av_objects_t        Av_object_container[AvMaxObjects];
 unsigned int        Av_num_of_objects;
 Av_orientation_t    Av_orientation;
-bool                Av_StopSignDet;
+bool                Av_StopSignDet, Av_CollisionWarning;
+double              Av_Arbitrated_Target_Yaw, Av_Arbitrated_Target_Speed, Av_Lane_Target_Yaw, Av_Lane_Target_Speed;
 
 
 int main(int argc, char **argv)
 {
+    double main_clock = 0;
+
     ros::init(argc, argv, "av_main");
 
     // Exit if no ROS
@@ -33,12 +36,20 @@ int main(int argc, char **argv)
         ros::Rate loop_rate(10);
         while(ros::ok())
         {
-           AV_SENSING();
-           AV_PERCEPTION();
-           AV_PLANNING();
-           AV_CONTROL();
-           ros::spinOnce();
-           loop_rate.sleep();
+            ROS_INFO("-- MAIN CLOCK: %f", main_clock);
+
+            AV_SENSING();
+            AV_PERCEPTION();
+            AV_PLANNING();
+            AV_CONTROL();
+            ros::spinOnce();
+            loop_rate.sleep();
+            main_clock++;
+
+            ROS_INFO(" Object Info");
+            ROS_INFO(" Num of objects PERC: %d", Av_num_of_objects);
+            ROS_INFO("   >> ID: %d. LP: %d, HP: %d, MINR: %lf, Fr: %d, Prox: %d", Av_object_container[0].Av_obj_id, Av_object_container[0].Av_scan_low_point, Av_object_container[0].Av_scan_high_point, Av_object_container[0].Av_object_range_min, Av_object_container[0].Av_object_in_front, Av_object_container[0].Av_object_proximity);
+            ROS_INFO("   >> ID: %d. LP: %d, HP: %d, MINR: %lf, Fr: %d, Prox: %d \n", Av_object_container[1].Av_obj_id, Av_object_container[1].Av_scan_low_point, Av_object_container[1].Av_scan_high_point, Av_object_container[1].Av_object_range_min, Av_object_container[1].Av_object_in_front, Av_object_container[1].Av_object_proximity);
         }
     }
 
@@ -47,7 +58,8 @@ int main(int argc, char **argv)
 
 void AV_INIT()
 {
-   Av_StopSignDet = False;
    AV_SENSING_INIT();
+   AV_PERCEPTION_INIT();
+   AV_PLANNING_INIT();
 }
 

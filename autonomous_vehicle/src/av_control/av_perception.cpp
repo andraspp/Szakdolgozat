@@ -7,30 +7,33 @@
 
 #include "av_perception.h"
 
+void AV_PERCEPTION_INIT(void)
+{
+    Av_CollisionWarning = false;
+    Av_StopSignDet      = false;
+}
 
 void AV_PERCEPTION(void)
 {
-    //ROS_INFO("Entered AV_PERCEPTION");
+    ROS_INFO("-- Entered AV_PERCEPTION");
     if(Av_num_of_objects > 0)
     {
         AV_SET_OBJECT_PROXIMITY();  /* Set their proximity state */
         AV_DETECT_FRONT_OBJECT();   /* Detect those that are in front of the AV */
+        AV_COLLISION_MONITORING();
     }
     else
     {
         /* Nothing to do */
     }
-
-    ROS_INFO("Object Info @ PERCEPTION");
-    ROS_INFO("Num of objects PERC: %d", Av_num_of_objects);
-    ROS_INFO("ID: %d. LP: %d, HP: %d, MINR: %lf, Fr: %d, Prox: %d", Av_object_container[0].Av_obj_id, Av_object_container[0].Av_scan_low_point, Av_object_container[0].Av_scan_high_point, Av_object_container[0].Av_object_range_min, Av_object_container[0].Av_object_in_front, Av_object_container[0].Av_object_proximity);
-    ROS_INFO("ID: %d. LP: %d, HP: %d, MINR: %lf, Fr: %d, Prox: %d", Av_object_container[1].Av_obj_id, Av_object_container[1].Av_scan_low_point, Av_object_container[1].Av_scan_high_point, Av_object_container[1].Av_object_range_min, Av_object_container[1].Av_object_in_front, Av_object_container[1].Av_object_proximity);
 }
 
 
 void AV_SET_OBJECT_PROXIMITY()
 {
-    for(int idx; idx < Av_num_of_objects; idx++)
+    int idx;
+
+    for(idx = 0; idx < Av_num_of_objects; idx++)
     {
         if(Av_object_container[idx].Av_object_range_min >= AvProxyFarThr) /* If range is really far, don't bother with state check */
         {
@@ -122,6 +125,7 @@ void AV_DETECT_FRONT_OBJECT()
     #if((AvDebugConfig & AvDebugFrontDetInfoEnable) > 0)
     ROS_INFO("Front Det entered");
     #endif /* AvDebugFrontDetInfoEnable */
+    AvTmpAngleCorr = ((-1)*(Av_Arbitrated_Target_Yaw));
 
     AvFrontCheckHighMark = (AvFrontAngle + AvFrontAngleOffset + AvTmpAngleCorr);
     AvFrontCheckLowMark = (AvFrontAngle - AvFrontAngleOffset + AvTmpAngleCorr);
@@ -149,6 +153,26 @@ void AV_DETECT_FRONT_OBJECT()
         }
 
     }
+}
+
+void AV_COLLISION_MONITORING()
+{
+    int idx;
+    Av_CollisionWarning = False;
+
+    for(idx = 0; idx < Av_num_of_objects; idx++)
+    {
+        if(   (Av_object_container[idx].Av_object_in_front == True)
+           && (   (Av_object_container[idx].Av_object_proximity == AvProximityClose)
+               || (Av_object_container[idx].Av_object_proximity == AvProximityDanger)
+               || (Av_object_container[idx].Av_object_range_min < 5.0)
+              )
+          )
+        {
+            Av_CollisionWarning = True;
+        }
+    }
+    ROS_INFO(" >> Collision warning: %d", Av_CollisionWarning);
 }
 
 void AV_DETECT_STOP_SIGN(Mat image)
@@ -179,7 +203,7 @@ void AV_DETECT_STOP_SIGN(Mat image)
         double dM10 = oMoments.m10;
         double dArea = oMoments.m00;
 
-        if (dArea > 30000)
+        if (dArea > 120000)
         {
             Av_StopSignDet = True;
         }
@@ -190,18 +214,25 @@ void AV_DETECT_STOP_SIGN(Mat image)
         std::cout << "exception caught: " << err_msg << std::endl;
     }
 
-    ROS_INFO("Stop sign detected: %d", Av_StopSignDet);
+    ROS_INFO(" >> Stop sign detected: %d", Av_StopSignDet);
 }
 
 void AV_DETECT_LANE(Mat image)
 {
-    Scalar Av_lower_black(0,0,0);
-    Scalar Av_upper_black(180,255,30);
-    Mat img_hsv;
-    Mat img_thr;
+    Scalar lower_black(0,0,0);
+    Scalar upper_black(180,255,30);
+    Scalar lower_yellow(20, 100, 100);
+    Scalar upper_yellow(30, 255, 255);
+    Scalar lower_white(0,0,200);
+    Scalar upper_white(0,0,255);
+    Mat img_hsv, img_gray;
+    Mat img_thr_road, img_thr_lane, img_thr_wht;
+    Mat img_band, img_gauss_gray, img_something;
+    Mat img_canny;
 
     int img_height, img_width;
-;
+
+    vector<Vec4i> lines;
 
     try
     {
@@ -209,11 +240,21 @@ void AV_DETECT_LANE(Mat image)
         img_height = image.size().height;
 
         cvtColor(image, img_hsv, COLOR_BGR2HSV);
-        inRange(img_hsv, Av_lower_black, Av_upper_black, img_thr); //Threshold the image
+        inRange(img_hsv, lower_black, upper_black, img_thr_road); //Threshold the image
+        Moments mom = moments(img_thr_road, false);
 
-        Moments mom = moments(img_thr, false);
+        AV_LINE_FOLLOW(mom, img_height, img_width);  
+        
 
-        AV_LINE_FOLLOW(mom, img_height, img_width);       		
+        cvtColor(image, img_gray, COLOR_BGR2GRAY);
+        inRange(img_hsv, lower_yellow, upper_yellow, img_thr_lane);
+        inRange(img_gray, lower_white, upper_white, img_thr_wht);
+        bitwise_or(img_thr_wht, img_thr_lane, img_something, noArray());
+        bitwise_and(img_gray, img_something ,img_band, noArray());
+        GaussianBlur(img_band, img_gauss_gray, Size(5,5), 3, 3, BORDER_DEFAULT);		
+
+        Canny( img_gauss_gray, img_canny, 50, 150, 3 );
+        HoughLinesP(img_canny, lines, 1, CV_PI/180, 80, 30, 10 );
 
     }
     catch( cv::Exception& e )

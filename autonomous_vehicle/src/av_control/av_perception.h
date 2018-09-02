@@ -12,8 +12,10 @@
 
 int AvFrontCheckHighMark;
 int AvFrontCheckLowMark;
+int AvTmpAngleCorr;
 
 void AV_SET_OBJECT_PROXIMITY(void);
 void AV_DETECT_FRONT_OBJECT (void);
+void AV_COLLISION_MONITORING(void);
 
 #endif /* SRC_AV_CONTROL_AV_PERCEPTION_H_ */

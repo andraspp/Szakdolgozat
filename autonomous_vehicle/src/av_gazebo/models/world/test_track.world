@@ -1,8 +1,10 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
   <world name="test_track_world">
+
     <include>
-      <uri>model://sun</uri>
+        <uri>model://sun</uri>
+        <pose>0.3 0.2 5.0 0 0 0</pose>
     </include>
 
     <!-- GROUND PLANE -->
@@ -46,9 +48,15 @@
 
     <!-- ROAD START -->
     <road name="test_road">
-      <width>2.5</width>
+      <width>5</width>
       <point>0 0 0.01</point>
-      <point>40 0 0.01</point>
+      <point>20 0 0.01</point>
+      <point>21 1 0.01</point>
+      <point>22 2 0.01</point>
+      <point>23 3 0.01</point>
+      <point>24 4 0.01</point>
+      <point>25 5 0.01</point>
+
       <point>45 2 0.01</point>
       <point>47 5 0.01</point>
       <point>47 25 0.01</point>

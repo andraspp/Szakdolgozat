@@ -27,14 +27,13 @@
 #define     True                (1)
 #define     False               (0)
 #define     AvFrontAngle        (320)
-#define     AvFrontAngleOffset  (15)
+#define     AvFrontAngleOffset  (25)
 #define     AvMaxObjects        (5)
-#define     AvTmpAngleCorr      (0)
 
 /* Object range thresholds */
-#define     AvProxyFarThr       (7)
-#define     AvProxyCloseThr     (4)
-#define     AvProxyDngrThr      (2)
+#define     AvProxyFarThr       (8)
+#define     AvProxyCloseThr     (6)
+#define     AvProxyDngrThr      (3)
 #define     AvProxyHyst         (0.1)
 
 /* DEBUG INFO handling */
@@ -51,10 +50,10 @@ using namespace std;
 using namespace cv_bridge;
 
 typedef enum Av_proximity_level_e {
-    AvProximityFar          = 0,
+    AvProximityUnknown      = 10,
+    AvProximityFar          = 3,
     AvProximityClose        = 2,
-    AvProximityDanger       = 3,
-    AvProximityUnknown      = 10
+    AvProximityDanger       = 1
 } Av_proximity_level_t;
 
 typedef struct Av_object_s {
@@ -76,7 +75,8 @@ typedef struct Av_orientation_s {
 extern Av_objects_t        Av_object_container[AvMaxObjects];
 extern unsigned int        Av_num_of_objects;
 extern Av_orientation_t    Av_orientation;
-extern bool                Av_StopSignDet;
+extern bool                Av_StopSignDet, Av_CollisionWarning;
+extern double              Av_Arbitrated_Target_Yaw, Av_Arbitrated_Target_Speed, Av_Lane_Target_Yaw, Av_Lane_Target_Speed;
 
 
 void AV_INIT(void);

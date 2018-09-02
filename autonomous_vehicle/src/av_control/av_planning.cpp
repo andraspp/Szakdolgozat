@@ -7,8 +7,33 @@
 
 #include "av_planning.h"
 
+void AV_PLANNING_INIT()
+{
+    Av_CollisionWarning = false;
+    Av_StopSignDet = false;
+    Av_Lane_Target_Yaw = 0.0;
+    Av_Arbitrated_Target_Speed = 0.0;
+    Av_Arbitrated_Target_Yaw = 0.0;
+}
+
 void AV_PLANNING()
 {
+   /* Arbitration */
+    ROS_INFO("-- Entered AV_PLANNING");
+
+    if(   (Av_StopSignDet == true)
+       || (Av_CollisionWarning == true)
+      )
+    {
+        Av_Arbitrated_Target_Yaw = 0.0;
+        Av_Arbitrated_Target_Speed = 0.0;
+    }
+    else
+    {
+        Av_Arbitrated_Target_Yaw = Av_Lane_Target_Yaw;
+        Av_Arbitrated_Target_Speed = Av_Lane_Target_Speed;
+    }
+   
    /* Nothing specific yet */
 }
 
@@ -53,14 +78,10 @@ void AV_LINE_FOLLOW(Moments mom, int img_height, int img_width)
     {
         yaw = -1.9;
     }
-    else if (   (yaw < 0.4)
-                && (yaw > (-0.4))
-            )
-    {
-        yaw = 0.0;
-    }
     else
     {}
 
-    AV_SET_VELO(yaw, throttle);
+    Av_Lane_Target_Speed = throttle;
+    Av_Lane_Target_Yaw = yaw;
+  
 }

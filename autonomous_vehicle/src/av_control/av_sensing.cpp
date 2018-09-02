@@ -25,7 +25,7 @@ void AV_SENSING(void)
 {
     bool          tmp_array_nonempty;
     
-    //ROS_INFO("Entered AV_SENSING");
+    ROS_INFO("-- Entered AV_SENSING");
     //ros::NodeHandle av_sens_nh;
     
    
@@ -84,7 +84,7 @@ void AV_SENSING(void)
 /***********************************************/
 void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
-    ROS_INFO("Entered AV_SENSING_LIDAR_CALLBACK");
+    ROS_INFO(" !! Entered AV_SENSING_LIDAR_CALLBACK");
     bool object_detected;
     signed int num_of_objects;
 
@@ -137,12 +137,6 @@ void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan)
     {
         AV_CLEAR_OBJ_ARRAY();
     }
-
-    #if((AvDebugConfig & AvDebugStoredObjectsInfoEnable) > 0)
-    ROS_INFO("temp num of objects: %d, stored num of objects: %d", num_of_objects, Av_num_of_objects);
-    ROS_INFO("Object 0's ID: %d", Av_tmp_container[0].Av_obj_id);
-    #endif /* AvDebugStoredObjectsInfoEnable */
-
 }
 
 /***********************************************/
@@ -150,10 +144,11 @@ void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan)
 /***********************************************/
 void AV_SENSING_ODOMETRY_CALLBACK(const nav_msgs::Odometry::ConstPtr& odom)
 {
-   Av_orientation.pose_x = odom->pose.pose.position.x;
-   Av_orientation.pose_y = odom->pose.pose.position.y;
-   Av_orientation.pose_z = odom->pose.pose.position.z;
-   Av_orientation.orient = odom->pose.pose.orientation;
+    ROS_INFO(" !! Entered AV_SENSING_ODOMETRY_CALLBACK");
+    Av_orientation.pose_x = odom->pose.pose.position.x;
+    Av_orientation.pose_y = odom->pose.pose.position.y;
+    Av_orientation.pose_z = odom->pose.pose.position.z;
+    Av_orientation.orient = odom->pose.pose.orientation;
 }
 
 /***********************************************/
@@ -161,7 +156,7 @@ void AV_SENSING_ODOMETRY_CALLBACK(const nav_msgs::Odometry::ConstPtr& odom)
 /***********************************************/
 void AV_SENSING_IMAGE_CALLBACK(const sensor_msgs::Image::ConstPtr& img_scan)
 {
-    ROS_INFO("Entered AV_SENSING_IMAGE_CALLBACK");
+    ROS_INFO(" !! Entered AV_SENSING_IMAGE_CALLBACK");
     /* convert to openCV somehow */
     try
     {
