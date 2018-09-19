@@ -9,6 +9,8 @@
 #define SRC_AV_CONTROL_AV_PERCEPTION_H_
 
 #include "av_control_common.h"
+#include "tgmath.h"
+#include "Python.h"
 
 int AvFrontCheckHighMark;
 int AvFrontCheckLowMark;

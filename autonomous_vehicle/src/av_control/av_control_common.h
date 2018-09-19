@@ -23,18 +23,10 @@
 #include <cv_bridge/cv_bridge.h>
 #include <sstream>
 #include <vector>
+#include "av_params.h"
 
 #define     True                (1)
 #define     False               (0)
-#define     AvFrontAngle        (320)
-#define     AvFrontAngleOffset  (25)
-#define     AvMaxObjects        (5)
-
-/* Object range thresholds */
-#define     AvProxyFarThr       (8)
-#define     AvProxyCloseThr     (6)
-#define     AvProxyDngrThr      (3)
-#define     AvProxyHyst         (0.1)
 
 /* DEBUG INFO handling */
 #define AvDebugSpeedInfoEnable          (0x01)

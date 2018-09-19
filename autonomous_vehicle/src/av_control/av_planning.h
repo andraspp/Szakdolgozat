@@ -1,7 +1,7 @@
 /*
  * av_planning.h
  *
- *  Created on: 2018. júl. 4.
+ *  Created on: 2018. jï¿½l. 4.
  *      Author: pappa3
  */
 

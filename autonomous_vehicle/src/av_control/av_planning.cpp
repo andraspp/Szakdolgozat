@@ -9,8 +9,8 @@
 
 void AV_PLANNING_INIT()
 {
-    Av_CollisionWarning = false;
-    Av_StopSignDet = false;
+    Av_CollisionWarning = False;
+    Av_StopSignDet = False;
     Av_Lane_Target_Yaw = 0.0;
     Av_Arbitrated_Target_Speed = 0.0;
     Av_Arbitrated_Target_Yaw = 0.0;
@@ -21,8 +21,8 @@ void AV_PLANNING()
    /* Arbitration */
     ROS_INFO("-- Entered AV_PLANNING");
 
-    if(   (Av_StopSignDet == true)
-       || (Av_CollisionWarning == true)
+    if(   (Av_StopSignDet == True)
+       || (Av_CollisionWarning == True)
       )
     {
         Av_Arbitrated_Target_Yaw = 0.0;
@@ -59,27 +59,31 @@ void AV_LINE_FOLLOW(Moments mom, int img_height, int img_width)
     ROS_INFO("X, Y: %f, %f", x, y);
     ROS_INFO("Width, Height: %d, %d", img_width, img_height);
 
-    //circle(img_extract, Point(x, y), 2, Scalar( 0, 0, 255 ), 1, LINE_8, 0);
-
-    //namedWindow("Image window",1);
-    //imshow("Image window", img_extract);
-    //waitKey(0);
-
     yaw = ((x - img_width/2) / 10) * (-1);
     ROS_INFO("center = %d, point = %f, yaw = %f", img_width/2, x, yaw);
 
-    throttle = 1.2;
+    throttle = AvThrottleBaseValue;
 
-    if (yaw > 1.9)
+    if (yaw > AvYawLimit)
     {
-        yaw = 1.9;
+        yaw = AvYawLimit;
     }
-    else if (yaw < (-1.9))
+    else if (yaw < ((-1)*(AvYawLimit)))
     {
-        yaw = -1.9;
+        yaw = ((-1)*(AvYawLimit));
     }
     else
     {}
+
+    if(throttle > (abs(yaw)+(AvThrYawDiff)))
+    {
+        throttle = throttle - abs(yaw);
+    }
+    else
+    {
+        throttle = AvThrYawDiff;
+    }
+    
 
     Av_Lane_Target_Speed = throttle;
     Av_Lane_Target_Yaw = yaw;

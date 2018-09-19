@@ -144,7 +144,7 @@ void AV_SENSING_LIDAR_CALLBACK(const sensor_msgs::LaserScan::ConstPtr& scan)
 /***********************************************/
 void AV_SENSING_ODOMETRY_CALLBACK(const nav_msgs::Odometry::ConstPtr& odom)
 {
-    ROS_INFO(" !! Entered AV_SENSING_ODOMETRY_CALLBACK");
+    //ROS_INFO(" !! Entered AV_SENSING_ODOMETRY_CALLBACK");
     Av_orientation.pose_x = odom->pose.pose.position.x;
     Av_orientation.pose_y = odom->pose.pose.position.y;
     Av_orientation.pose_z = odom->pose.pose.position.z;

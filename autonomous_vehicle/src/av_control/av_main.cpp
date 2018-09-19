@@ -51,6 +51,8 @@ int main(int argc, char **argv)
             ROS_INFO("   >> ID: %d. LP: %d, HP: %d, MINR: %lf, Fr: %d, Prox: %d", Av_object_container[0].Av_obj_id, Av_object_container[0].Av_scan_low_point, Av_object_container[0].Av_scan_high_point, Av_object_container[0].Av_object_range_min, Av_object_container[0].Av_object_in_front, Av_object_container[0].Av_object_proximity);
             ROS_INFO("   >> ID: %d. LP: %d, HP: %d, MINR: %lf, Fr: %d, Prox: %d \n", Av_object_container[1].Av_obj_id, Av_object_container[1].Av_scan_low_point, Av_object_container[1].Av_scan_high_point, Av_object_container[1].Av_object_range_min, Av_object_container[1].Av_object_in_front, Av_object_container[1].Av_object_proximity);
         }
+        
+        AV_SET_VELO(0.0, 0.0);
     }
 
     return 0;

@@ -181,29 +181,35 @@ void AV_DETECT_STOP_SIGN(Mat image)
     Scalar Av_upper_red(179,255,255);
     Mat img_hsv;
     Mat img_thr;
+    double dM10, dM01, dArea;
     
     Av_StopSignDet = False;
 
     try
     {
         cvtColor(image, img_hsv,  cv::COLOR_BGR2HSV);
-        inRange(img_hsv, Scalar(Av_lower_red[0], Av_lower_red[1], Av_lower_red[2]), Scalar(Av_upper_red[0], Av_upper_red[1], Av_upper_red[2]), img_thr); //Threshold the image
+        inRange(img_hsv, Av_lower_red, Av_upper_red, img_thr); //Threshold the image
             
         //morphological opening (remove small objects from the foreground)
-        erode(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-        dilate(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+        /*erode(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        dilate(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );*/ 
 
         //morphological closing (fill small holes in the foreground)
-        dilate(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-        erode(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        /*dilate(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+        erode(img_thr, img_thr, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );*/
 
         Moments oMoments = moments(img_thr);
 
-        double dM01 = oMoments.m01;
-        double dM10 = oMoments.m10;
-        double dArea = oMoments.m00;
+        //bitwise_and(image,img_thr,image,noArray());
+        namedWindow("StopSign",1);
+        imshow("StopSign", img_thr);
+        waitKey(1);
 
-        if (dArea > 120000)
+        dM01 = oMoments.m01;
+        dM10 = oMoments.m10;
+        dArea = oMoments.m00;
+
+        if (dArea > AvStopSignAreaThreshold)
         {
             Av_StopSignDet = True;
         }
@@ -214,25 +220,25 @@ void AV_DETECT_STOP_SIGN(Mat image)
         std::cout << "exception caught: " << err_msg << std::endl;
     }
 
-    ROS_INFO(" >> Stop sign detected: %d", Av_StopSignDet);
+    ROS_INFO(" >> StopSign area: %f, Stop sign detected: %d", dArea, Av_StopSignDet);
 }
 
 void AV_DETECT_LANE(Mat image)
 {
     Scalar lower_black(0,0,0);
     Scalar upper_black(180,255,30);
-    Scalar lower_yellow(20, 100, 100);
-    Scalar upper_yellow(30, 255, 255);
-    Scalar lower_white(0,0,200);
-    Scalar upper_white(0,0,255);
-    Mat img_hsv, img_gray;
-    Mat img_thr_road, img_thr_lane, img_thr_wht;
-    Mat img_band, img_gauss_gray, img_something;
-    Mat img_canny;
+    Scalar lower_white(0,25,0);
+    Scalar upper_white(0,100,0);
+    Mat img_hsv, img_hsl;
+    Mat mask_b, mask_w;
+    Mat img_canny, img_lines, img_weighted;
 
     int img_height, img_width;
+    int i;
+    double avg;
 
     vector<Vec4i> lines;
+    Vec4i v;
 
     try
     {
@@ -240,21 +246,65 @@ void AV_DETECT_LANE(Mat image)
         img_height = image.size().height;
 
         cvtColor(image, img_hsv, COLOR_BGR2HSV);
-        inRange(img_hsv, lower_black, upper_black, img_thr_road); //Threshold the image
-        Moments mom = moments(img_thr_road, false);
-
-        AV_LINE_FOLLOW(mom, img_height, img_width);  
+        inRange(img_hsv, lower_black, upper_black, mask_b); //Threshold the image
+ 
         
 
-        cvtColor(image, img_gray, COLOR_BGR2GRAY);
-        inRange(img_hsv, lower_yellow, upper_yellow, img_thr_lane);
-        inRange(img_gray, lower_white, upper_white, img_thr_wht);
-        bitwise_or(img_thr_wht, img_thr_lane, img_something, noArray());
-        bitwise_and(img_gray, img_something ,img_band, noArray());
-        GaussianBlur(img_band, img_gauss_gray, Size(5,5), 3, 3, BORDER_DEFAULT);		
+        cvtColor(image, img_hsl, COLOR_BGR2HLS);
+        inRange(img_hsl, lower_white, upper_white, mask_w);
+        //bitwise_and(image, image, rgb_w, mask_w);
+        //cvtColor(rgb_w, rgb_w, COLOR_BGR2GRAY);
+        //threshold(rgb_w, rgb_w, 20,255,THRESH_BINARY );
+       	
 
-        Canny( img_gauss_gray, img_canny, 50, 150, 3 );
-        HoughLinesP(img_canny, lines, 1, CV_PI/180, 80, 30, 10 );
+        bitwise_or(mask_w, mask_b, mask_b);
+
+        Moments mom_b = moments(mask_b, false);
+
+        AV_LINE_FOLLOW(mom_b, img_height, img_width); 
+
+        GaussianBlur(mask_w, mask_w, Size(3,3), 3, 3, BORDER_DEFAULT);
+        Canny( mask_w, img_canny, 50, 150, 3 );
+
+        HoughLinesP(img_canny, lines, AvHoughRho, AvHoughTheta, AvHoughThreshold, AvHoughMinLineLength, AvHoughMaxLineGap );
+
+        avg = 0;
+        for (i = 0; i < lines.size(); i++)
+        {
+            v = lines[i];
+            line(image, Point(v[0],v[1]), Point(v[2],v[3]), Scalar(0,255,0), 2, LINE_8, 0 );
+            if((v[1]-v[0]) == 0)
+            {
+                slope = 999;
+            }
+            else
+            {
+                slope = ((v[3] - v[2])/(v[1] - v[0]));
+                
+                if(avg == 0)
+                {
+                    avg += slope;
+                }
+                else
+                {
+                    
+                }
+            }
+            
+        }
+
+
+        /**namedWindow("Mask White",1);
+        imshow("Mask White", mask_w);
+        waitKey(1);*/
+
+        namedWindow("Canny",1);
+        imshow("Canny", img_canny);
+        waitKey(1);
+
+        namedWindow("Weighted",1);
+        imshow("Weighted", image);
+        waitKey(1);  
 
     }
     catch( cv::Exception& e )
