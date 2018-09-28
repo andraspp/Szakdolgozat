@@ -10,7 +10,7 @@
 
 #include "av_control_common.h"
 #include "tgmath.h"
-#include "Python.h"
+#include "Polynomial.h"
 
 int AvFrontCheckHighMark;
 int AvFrontCheckLowMark;

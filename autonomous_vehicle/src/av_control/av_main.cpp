@@ -3,8 +3,10 @@
 Av_objects_t        Av_object_container[AvMaxObjects];
 unsigned int        Av_num_of_objects;
 Av_orientation_t    Av_orientation;
-bool                Av_StopSignDet, Av_CollisionWarning;
+bool                Av_StopSignDet, Av_CollisionWarning, Av_SideWayCollWarning;
 double              Av_Arbitrated_Target_Yaw, Av_Arbitrated_Target_Speed, Av_Lane_Target_Yaw, Av_Lane_Target_Speed;
+unsigned int        Av_scan_low_points_LL[AvMaxObjects];
+unsigned int        Av_scan_high_points_LL[AvMaxObjects];
 
 
 int main(int argc, char **argv)

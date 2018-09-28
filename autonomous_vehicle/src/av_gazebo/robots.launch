@@ -1,0 +1,19 @@
+<launch>
+  <!-- BEGIN ROBOT 1-->
+  <group ns="av_robot">
+    <param name="tf_prefix" value="av_robot_tf" />
+    <include file="$(find av_gazebo)/one_robot.launch" >
+      <arg name="init_pose" value="-x 1 -y 1 -z 0" />
+      <arg name="robot_name"  value="av_robot" />
+    </include>
+  </group>
+
+  <!-- BEGIN ROBOT 2-->
+  <group ns="av_drone">
+    <param name="tf_prefix" value="av_drone_tf" />
+    <include file="$(find av_gazebo)/one_robot.launch" >
+      <arg name="init_pose" value="-x -1 -y 1 -z 0" />
+      <arg name="robot_name"  value="av_drone" />
+    </include>
+  </group>
+</launch>

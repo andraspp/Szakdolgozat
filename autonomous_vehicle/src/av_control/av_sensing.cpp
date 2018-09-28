@@ -60,6 +60,8 @@ void AV_SENSING(void)
     {
         for (int idx=0; idx < AvMaxObjects; idx++)
         {
+            Av_scan_low_points_LL[idx] = Av_object_container[idx].Av_scan_low_point;
+            Av_scan_high_points_LL[idx] = Av_object_container[idx].Av_scan_high_point;
             Av_object_container[idx].Av_scan_low_point     = Av_tmp_container[idx].Av_scan_low_point;
             Av_object_container[idx].Av_scan_high_point    = Av_tmp_container[idx].Av_scan_high_point;
             Av_object_container[idx].Av_object_range_min   = Av_tmp_container[idx].Av_object_range_min;

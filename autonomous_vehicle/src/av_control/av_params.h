@@ -17,6 +17,7 @@
 #define AvHoughThreshold                (15)
 #define AvHoughMinLineLength            (10)
 #define AvHoughMaxLineGap               (60)
+#define AvCenterLine                    (320)
 
 /* AV_PLANNING parameters*/
 #define AvThrottleBaseValue             (6.0)

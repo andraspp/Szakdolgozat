@@ -67,7 +67,9 @@ typedef struct Av_orientation_s {
 extern Av_objects_t        Av_object_container[AvMaxObjects];
 extern unsigned int        Av_num_of_objects;
 extern Av_orientation_t    Av_orientation;
-extern bool                Av_StopSignDet, Av_CollisionWarning;
+extern unsigned int        Av_scan_low_points_LL[AvMaxObjects];
+extern unsigned int        Av_scan_high_points_LL[AvMaxObjects];
+extern bool                Av_StopSignDet, Av_CollisionWarning, Av_SideWayCollWarning;
 extern double              Av_Arbitrated_Target_Yaw, Av_Arbitrated_Target_Speed, Av_Lane_Target_Yaw, Av_Lane_Target_Speed;
 
 
